@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Peminjam Alat - Data Alat</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+
+<body class="bg-gray-100 font-sans text-gray-700">
+
+
+<div class="flex min-h-screen">
+
+
+    <!-- SIDEBAR -->
+
+    <aside class="w-56 bg-white border-r shadow-sm fixed h-screen">
+
+        <div class="p-6 border-b">
+
+            <h2 class="text-xl font-bold text-blue-600">
+                PEMINJAM ALAT
+            </h2>
+
+        </div>
+        <nav class="py-4 mt-16 md:mt-0 font-medium">
+
+    <a href="dashboard.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        DASHBOARD
+    </a>
+
+    <a href="DataKategori.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        DATA KATEGORI
+    </a>
+
+    <a href="DataAlat.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        DATA ALAT
+    </a>
+
+    <a href="TambahAlat.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        TAMBAH ALAT
+    </a>
+
+    <a href="Peminjaman.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        PEMINJAMAN
+    </a>
+
+    <a href="TambahPeminjaman.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        TAMBAH PEMINJAMAN
+    </a>
+
+</nav>
+    </aside>
+
+
+
+    <!-- CONTENT -->
+
+    <main class="ml-56 flex-1 p-8">
+
+
+        <!-- JUDUL -->
+
+        <div class="flex justify-between items-center mb-6">
+
+            <div>
+
+                <h1 class="text-3xl font-bold text-gray-800">
+                    Data Alat
+                </h1>
+
+                <p class="text-gray-500 mt-1">
+                    Daftar alat yang tersedia untuk dipinjam.
+                </p>
+
+            </div>
+
+
+            <a href="TambahAlat.html"
+               class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold">
+
+                + Tambah Alat
+
+            </a>
+
+        </div>
+
+
+
+        <!-- TABEL -->
+
+        <div class="bg-white rounded-xl shadow-md overflow-hidden">
+
+            <div class="overflow-x-auto">
+
+                <table class="w-full">
+
+                    <thead class="bg-blue-600 text-white">
+
+                        <tr>
+
+                            <th class="px-5 py-4 text-left">
+                                No
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                ID Alat
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                Nama Alat
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                Kategori
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                Kondisi
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                Stok
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                Lokasi
+                            </th>
+
+                            <th class="px-5 py-4 text-left">
+                                Aksi
+                            </th>
+
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody
+                        id="tabelAlat"
+                        class="divide-y">
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+
+    </main>
+
+</div>
+
+
+
+<script>
+
+
+const API_ALAT = "http://localhost:3000/api/alat";
+const API_KATEGORI = "http://localhost:3000/api/kategori";
+
+let listAlat = [];
+
+let listKategori = [];
+
+
+
+// =====================================
+// LOAD KATEGORI
+// =====================================
+
+async function loadKategori() {
+
+    try {
+
+        const response =
+            await fetch(API_KATEGORI);
+
+        if (!response.ok) {
+            throw new Error("Gagal mengambil kategori");
+        }
+
+        const data =
+            await response.json();
+
+        listKategori =
+            Array.isArray(data)
+                ? data
+                : [];
+
+    } catch (error) {
+
+        console.error(
+            "Kategori:",
+            error
+        );
+
+        listKategori = [];
+
+    }
+
+}
+
+
+
+// =====================================
+// CARI NAMA KATEGORI
+// =====================================
+
+function getNamaKategori(idKategori) {
+
+    const kategori =
+        listKategori.find(
+            k =>
+                Number(k.id_kategori) ===
+                Number(idKategori)
+        );
+
+
+    if (kategori) {
+
+        return (
+            kategori.nama_kategori ||
+            "-"
+        );
+
+    }
+
+
+    return "-";
+
+}
+
+
+
+// =====================================
+// LOAD DATA ALAT
+// =====================================
+
+async function loadAlat() {
+
+    const tabel =
+        document.getElementById("tabelAlat");
+
+
+    tabel.innerHTML = `
+
+        <tr>
+
+            <td colspan="8"
+                class="text-center py-8 text-gray-500">
+
+                Memuat data alat...
+
+            </td>
+
+        </tr>
+
+    `;
+
+
+    try {
+
+        const response =
+            await fetch(API_ALAT);
+
+
+        if (!response.ok) {
+
+            throw new Error(
+                "Gagal mengambil data alat"
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        listAlat =
+            Array.isArray(data)
+                ? data
+                : [];
+
+
+        tampilkanAlat();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        tabel.innerHTML = `
+
+            <tr>
+
+                <td colspan="8"
+                    class="text-center py-8 text-red-500">
+
+                    Gagal mengambil data alat.<br>
+
+                    Pastikan server backend
+                    sudah berjalan.
+
+                </td>
+
+            </tr>
+
+        `;
+
+    }
+
+}
+
+
+
+// =====================================
+// TAMPILKAN DATA
+// =====================================
+
+function tampilkanAlat() {
+
+    const tabel =
+        document.getElementById("tabelAlat");
+
+
+    tabel.innerHTML = "";
+
+
+    if (listAlat.length === 0) {
+
+        tabel.innerHTML = `
+
+            <tr>
+
+                <td colspan="8"
+                    class="text-center py-8 text-gray-500">
+
+                    Belum ada data alat.
+
+                </td>
+
+            </tr>
+
+        `;
+
+        return;
+
+    }
+
+
+
+    listAlat.forEach(
+        (alat, index) => {
+
+
+        const namaKategori =
+            alat.nama_kategori ||
+            getNamaKategori(
+                alat.id_kategori
+            );
+
+
+        let kondisiClass =
+            "bg-gray-100 text-gray-700";
+
+
+        if (alat.kondisi === "Baik") {
+
+            kondisiClass =
+                "bg-green-100 text-green-700";
+
+        }
+
+        else if (
+            alat.kondisi ===
+            "Rusak Ringan"
+        ) {
+
+            kondisiClass =
+                "bg-yellow-100 text-yellow-700";
+
+        }
+
+        else if (
+            alat.kondisi ===
+            "Rusak Berat"
+        ) {
+
+            kondisiClass =
+                "bg-red-100 text-red-700";
+
+        }
+
+
+
+        tabel.innerHTML += `
+
+            <tr class="hover:bg-blue-50">
+
+
+                <td class="px-5 py-4">
+                    ${index + 1}
+                </td>
+
+
+                <td class="px-5 py-4">
+                    ${alat.id_alat ?? "-"}
+                </td>
+
+
+                <td class="px-5 py-4 font-semibold text-gray-800">
+                    ${alat.nama_alat ?? "-"}
+                </td>
+
+
+                <td class="px-5 py-4">
+                    ${namaKategori}
+                </td>
+
+
+                <td class="px-5 py-4">
+
+                    <span
+                        class="px-3 py-1 rounded-full text-sm ${kondisiClass}">
+
+                        ${alat.kondisi ?? "-"}
+
+                    </span>
+
+                </td>
+
+
+                <td class="px-5 py-4">
+                    ${alat.stok ?? 0}
+                </td>
+
+
+                <td class="px-5 py-4">
+                    ${alat.lokasi ?? "-"}
+                </td>
+
+
+                <td class="px-5 py-4 whitespace-nowrap">
+
+
+                    <button
+                        onclick="editAlat(${alat.id_alat})"
+                        class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-2 rounded-lg">
+
+                        Edit
+
+                    </button>
+
+
+                    <button
+                        onclick="hapusAlat(${alat.id_alat})"
+                        class="bg-red-500 hover:bg-red-600 text-white px-3 py-2 rounded-lg ml-1">
+
+                        Hapus
+
+                    </button>
+
+
+                </td>
+
+            </tr>
+
+        `;
+
+    });
+
+}
+
+
+
+// =====================================
+// EDIT
+// =====================================
+
+function editAlat(id) {
+
+    window.location.href =
+        "TambahAlat.html?id=" +
+        encodeURIComponent(id);
+
+}
+
+
+
+// =====================================
+// HAPUS
+// =====================================
+
+async function hapusAlat(id) {
+
+    const yakin =
+        confirm(
+            "Apakah kamu yakin ingin menghapus alat ini?"
+        );
+
+
+    if (!yakin) {
+        return;
+    }
+
+
+    try {
+
+        const response =
+            await fetch(
+                `${API_ALAT}/${encodeURIComponent(id)}`,
+                {
+                    method: "DELETE"
+                }
+            );
+
+
+        let hasil = {};
+
+        try {
+
+            hasil =
+                await response.json();
+
+        } catch (error) {}
+
+
+
+        if (!response.ok) {
+
+            alert(
+                "Gagal menghapus alat: " +
+                (
+                    hasil.message ||
+                    response.status
+                )
+            );
+
+            return;
+
+        }
+
+
+        alert(
+            "Data alat berhasil dihapus!"
+        );
+
+
+        loadAlat();
+
+
+    } catch (error) {
+
+        console.error(error);
+
+
+        alert(
+            "Backend tidak dapat dihubungi."
+        );
+
+    }
+
+}
+
+
+
+// =====================================
+// JALANKAN
+// =====================================
+
+async function mulai() {
+
+    await loadKategori();
+
+    await loadAlat();
+
+}
+
+
+mulai();
+
+
+</script>
+
+
+</body>
+</html>

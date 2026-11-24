@@ -1,0 +1,417 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peminjaman Alat - Tambah Alat</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 font-sans text-gray-700">
+
+<div class="flex min-h-screen">
+
+    <!-- SIDEBAR -->
+    <aside class="w-56 bg-white border-r shadow-sm fixed h-screen">
+
+        <div class="p-6 border-b">
+            <h2 class="text-xl font-bold text-blue-600">
+                PEMINJAM ALAT
+            </h2>
+        </div>
+
+        <nav class="py-4 mt-16 md:mt-0 font-medium">
+
+    <a href="dashboard.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        DASHBOARD
+    </a>
+
+    <a href="DataKategori.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        DATA KATEGORI
+    </a>
+
+    <a href="DataAlat.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        DATA ALAT
+    </a>
+
+    <a href="TambahAlat.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        TAMBAH ALAT
+    </a>
+
+    <a href="Peminjaman.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        PEMINJAMAN
+    </a>
+
+    <a href="TambahPeminjaman.html"
+        class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+        TAMBAH PEMINJAMAN
+    </a>
+
+</nav>
+    </aside>
+
+
+    <!-- CONTENT -->
+    <main class="ml-56 flex-1 p-8">
+
+        <h1 id="judul" class="text-3xl font-bold text-gray-800 mb-2">
+            Tambah Alat
+        </h1>
+
+        <p class="text-gray-500 mb-6">
+            Tambahkan data alat baru ke dalam sistem.
+        </p>
+
+
+        <!-- FORM -->
+        <div class="bg-white rounded-xl shadow-md p-6 max-w-2xl">
+
+            <form id="formTambah">
+
+                <!-- NAMA ALAT -->
+                <div class="mb-4">
+
+                    <label class="block font-semibold mb-2">
+                        Nama Alat
+                    </label>
+
+                    <input
+                        type="text"
+                        id="nama_alat"
+                        name="nama_alat"
+                        placeholder="Contoh: Proyektor"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                        required>
+
+                </div>
+
+
+                <!-- KATEGORI -->
+                <div class="mb-4">
+
+                    <label class="block font-semibold mb-2">
+                        Kategori
+                    </label>
+
+                    <select
+                        id="id_kategori"
+                        name="id_kategori"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                        required>
+
+                        <option value="">
+                            -- Pilih Kategori --
+                        </option>
+
+                    </select>
+
+                </div>
+                <!-- STOK -->
+                <div class="mb-4">
+
+                    <label class="block font-semibold mb-2">
+                        Stok
+                    </label>
+
+                    <input
+                        type="number"
+                        id="stok"
+                        name="stok"
+                        min="0"
+                        placeholder="Contoh: 5"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                        required>
+
+                </div>
+                <!-- LOKASI -->
+                <div class="mb-6">
+
+                    <label class="block font-semibold mb-2">
+                        Lokasi
+                    </label>
+
+                    <input
+                        type="text"
+                        id="lokasi"
+                        name="lokasi"
+                        placeholder="Contoh: Lab RPL"
+                        class="w-full border border-gray-300 rounded-lg px-4 py-2"
+                        required>
+
+                </div>
+
+
+                <!-- BUTTON -->
+                <div class="flex gap-3">
+
+                    <button
+                        type="submit"
+                        id="btnSimpan"
+                        class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2 rounded-lg font-semibold">
+
+                        Simpan
+
+                    </button>
+
+                    <a
+                        href="DataAlat.html"
+                        class="bg-gray-500 hover:bg-gray-600 text-white px-5 py-2 rounded-lg font-semibold">
+
+                        Kembali
+
+                    </a>
+
+                </div>
+
+            </form>
+        </div>
+
+    </main>
+</div>
+
+
+<script>
+
+// URL API
+const API_ALAT = "http://localhost:3000/api/alat";
+const API_KATEGORI = "http://localhost:3000/api/kategori";
+
+// CEK MODE EDIT
+const params = new URLSearchParams(window.location.search);
+const editId = params.get("id");
+
+
+// ==================================
+// LOAD DATA KATEGORI
+// ==================================
+
+async function loadKategori() {
+
+    const select = document.getElementById("id_kategori");
+
+    try {
+
+        const response = await fetch(API_KATEGORI);
+
+        if (!response.ok) {
+            throw new Error("Gagal mengambil data kategori");
+        }
+
+        const kategori = await response.json();
+
+        select.innerHTML = `
+            <option value="">-- Pilih Kategori --</option>
+        `;
+
+        kategori.forEach(k => {
+
+            const option = document.createElement("option");
+
+            option.value = k.id_kategori;
+            option.textContent = k.nama_kategori;
+
+            select.appendChild(option);
+
+        });
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert("Kategori gagal dimuat. Periksa backend dan database.");
+    }
+}
+// ==================================
+// LOAD DATA ALAT UNTUK EDIT
+// ==================================
+
+async function loadDataEdit() {
+
+    if (!editId) return;
+
+    try {
+
+        // Mengambil seluruh data alat
+        const response = await fetch(API_ALAT);
+
+        if (!response.ok) {
+            throw new Error("Gagal mengambil data alat");
+        }
+
+        const semuaAlat = await response.json();
+
+        // Mencari alat berdasarkan ID
+        const alat = semuaAlat.find(
+            item => String(item.id_alat) === String(editId)
+        );
+
+        if (!alat) {
+            throw new Error("Data alat tidak ditemukan");
+        }
+
+        // Mengisi form
+        document.getElementById("nama_alat").value =
+            alat.nama_alat || "";
+
+        document.getElementById("id_kategori").value =
+            alat.id_kategori || "";
+
+        document.getElementById("stok").value =
+            alat.stok ?? "";
+
+        document.getElementById("lokasi").value =
+            alat.lokasi || "";
+
+        // Mengubah judul dan tombol
+        document.getElementById("judul").textContent =
+            "Edit Alat";
+
+        document.getElementById("btnSimpan").textContent =
+            "Update";
+
+    } catch (error) {
+
+        console.error(error);
+
+        alert(error.message);
+    }
+}
+// ==================================
+// SIMPAN DAN UPDATE DATA ALAT
+// ==================================
+
+document.getElementById("formTambah").addEventListener(
+    "submit",
+    async function(event) {
+
+        event.preventDefault();
+
+        const btn = document.getElementById("btnSimpan");
+
+        // Mengambil data dari form
+        const payload = {
+
+            id_kategori: Number(
+                document.getElementById("id_kategori").value
+            ),
+
+            nama_alat: document.getElementById("nama_alat").value.trim(),
+
+            stok: Number(
+                document.getElementById("stok").value
+            ),
+
+            lokasi: document.getElementById("lokasi").value.trim()
+
+        };
+        // VALIDASI
+        if (!payload.nama_alat) {
+            alert("Nama alat wajib diisi.");
+            return;
+        }
+
+        if (!payload.id_kategori) {
+            alert("Kategori wajib dipilih.");
+            return;
+        }
+
+        if (
+            document.getElementById("stok").value === "" ||
+            !Number.isInteger(payload.stok) ||
+            payload.stok < 0
+        ) {
+            alert("Stok harus berupa bilangan bulat minimal 0.");
+            return;
+        }
+
+        if (!payload.lokasi) {
+            alert("Lokasi wajib diisi.");
+            return;
+        }
+
+
+        try {
+
+            btn.disabled = true;
+            btn.textContent = "Menyimpan...";
+
+            // Menentukan URL dan metode
+            const url = editId
+                ? `${API_ALAT}/${encodeURIComponent(editId)}`
+                : API_ALAT;
+
+            const method = editId ? "PUT" : "POST";
+
+
+            // Mengirim data ke backend
+            const response = await fetch(url, {
+
+                method: method,
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify(payload)
+
+            });
+
+
+            const hasil = await response.json();
+
+            if (!response.ok) {
+                throw new Error(
+                    hasil.message || "Gagal menyimpan data alat"
+                );
+            }
+
+
+            // PESAN BERHASIL
+            alert(
+                editId
+                    ? "Data alat berhasil diperbarui!"
+                    : "Data alat berhasil ditambahkan!"
+            );
+
+
+            // Kembali ke halaman data alat
+            window.location.href = "DataAlat.html";
+
+
+        } catch (error) {
+
+            console.error(error);
+
+            alert(
+                "Gagal menyimpan data: " + error.message
+            );
+
+            btn.disabled = false;
+
+            btn.textContent = editId
+                ? "Update"
+                : "Simpan";
+
+        }
+
+    }
+);
+// ==================================
+// MENJALANKAN PROGRAM
+// ==================================
+async function mulai() {
+
+    await loadKategori();
+
+    await loadDataEdit();
+}
+mulai();
+</script>
+</body>
+</html>

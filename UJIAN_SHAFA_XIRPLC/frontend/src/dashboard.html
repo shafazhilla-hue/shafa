@@ -1,0 +1,185 @@
+
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Peminjam Alat - Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+        }
+
+        .menu-transition {
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .card-hover {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+    </style>
+</head>
+<body class="bg-[#f4f8fc] font-sans text-gray-700">
+    <!-- LAYOUT -->
+    <div class="flex min-h-[calc(100vh-88px)] relative">
+
+        <div id="sidebarOverlay" onclick="toggleSidebar()"
+            class="fixed inset-0 bg-black/50 z-10 hidden md:hidden">
+        </div>
+        
+<!-- SIDEBAR -->
+<aside id="sidebar"
+    class="w-64 bg-white border-r border-gray-200 shadow-sm
+    fixed md:static inset-y-0 left-0 z-20
+    transform -translate-x-full md:translate-x-0
+    transition-transform duration-300 ease-in-out">
+
+    <!-- LOGO / JUDUL -->
+    <div class="px-6 py-5 border-b border-gray-200">
+        <h2 class="text-xl font-bold text-blue-600">
+            PEMINJAMAN ALAT
+        </h2>
+        <p class="text-xs text-gray-500 mt-1">
+            Sistem Informasi Peminjaman
+        </p>
+    </div>
+
+    <!-- MENU NAVIGASI -->
+    <nav class="py-4 font-medium">
+
+        <p class="px-6 py-2 text-xs font-bold text-gray-400">
+            MENU UTAMA
+        </p>
+
+        <a href="dashboard.html"
+            class="block px-6 py-3 bg-blue-100 text-blue-600
+            border-l-4 border-blue-600 font-bold">
+            <span></span> DASHBOARD
+        </a>
+
+        <p class="px-6 py-3 mt-3 text-xs font-bold text-gray-400">
+            DATA MASTER
+        </p>
+
+        <a href="DataKategori.html"
+            class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+             KELOLA KATEGORI
+        </a>
+
+        <a href="DataAlat.html"
+            class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+             KELOLA ALAT
+        </a>
+
+        <a href="TambahAlat.html"
+            class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+            TAMBAH ALAT
+        </a>
+
+        <p class="px-6 py-3 mt-3 text-xs font-bold text-gray-400">
+            TRANSAKSI PEMINJAMAN
+        </p>
+
+        <a href="Peminjaman.html"
+            class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+             KELOLA PEMINJAMAN
+        </a>
+
+        <a href="TambahPinjaman.html"
+            class="block px-6 py-3 text-gray-700 hover:bg-blue-50 hover:text-blue-600">
+             TAMBAH PEMINJAMAN
+        </a>
+
+    </nav>
+</aside>
+
+
+        <!-- CONTENT -->
+        <main class="flex-1 p-4 md:p-8 w-full overflow-x-hidden">
+
+            <section class="mb-6">
+                <h2 class="text-2xl md:text-3xl font-bold text-gray-800">
+                    Ringkasan Dashboard Peminjaman Alat
+                </h2>
+            </section>
+
+        
+            <!-- TABEL TRANSAKSI TERBARU -->
+            <section class="bg-white rounded-xl shadow-md overflow-hidden">
+
+                <div class="bg-[#2563eb] text-white px-5 py-4">
+                    <h3 class="text-lg font-bold">
+                        Transaksi Terbaru
+                    </h3>
+                </div>
+
+                <div class="overflow-x-auto">
+
+                    <table class="w-full min-w-[650px]">
+
+                        <thead class="bg-blue-50">
+                            <tr>
+                                <th class="px-5 py-3 text-left font-bold">
+                                    ID Transaksi
+                                </th>
+
+                                <th class="px-5 py-3 text-left font-bold">
+                                    Pelanggan
+                                </th>
+
+                                <th class="px-5 py-3 text-left font-bold">
+                                    Total
+                                </th>
+
+                                <th class="px-5 py-3 text-left font-bold">
+                                    Status
+                                </th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-100">
+
+                            <tr class="hover:bg-blue-50/50">
+
+                                <td class="px-5 py-4 font-semibold">
+                                    1234
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    zahra
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    Rp 50.000
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    <span
+                                        class="bg-green-100 text-green-700 text-xs px-3 py-1 rounded-full font-bold">
+                                        Selesai
+                                    </span>
+                                </td>
+
+                            </tr>
+
+                            <tr class="hover:bg-blue-50/50">
+
+                                <td class="px-5 py-4 font-semibold">
+                                    5678
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    manda
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    Rp 75.000
+                                </td>
+
+                                <td class="px-5 py-4">
+                                    <span
+                                        class="bg-yellow-100 text-yellow-700 text-xs px

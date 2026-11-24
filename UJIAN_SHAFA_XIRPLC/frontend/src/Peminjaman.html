@@ -1,0 +1,183 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Data Peminjaman</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+    <body class="bg-gray-100 text-gray-700">
+
+    <div class="flex min-h-screen">
+
+        <!-- NAVIGASI -->
+        <aside class="w-56 bg-white shadow-md min-h-screen">
+            <h2 class="text-xl font-bold text-blue-600 p-5">
+                PEMINJAMAN ALAT
+            </h2>
+
+            <nav class="font-medium">
+
+                <a href="dashboard.html"
+                    class="block px-6 py-3 hover:bg-blue-50">
+                    DASHBOARD
+                </a>
+
+                <a href="DataKategori.html"
+                    class="block px-6 py-3 hover:bg-blue-50">
+                    DATA KATEGORI
+                </a>
+
+                <a href="DataAlat.html"
+                    class="block px-6 py-3 hover:bg-blue-50">
+                    DATA ALAT
+                </a>
+
+                <a href="TambahAlat.html"
+                    class="block px-6 py-3 hover:bg-blue-50">
+                    TAMBAH ALAT
+                </a>
+
+                <a href="Peminjaman.html"
+                    class="block px-6 py-3 bg-blue-100 text-blue-600 font-bold">
+                    PEMINJAMAN
+                </a>
+
+                <a href="TambahPeminjaman.html"
+                    class="block px-6 py-3 hover:bg-blue-50">
+                    TAMBAH PEMINJAMAN
+                </a>
+
+            </nav>
+        </aside>
+
+        <!-- KONTEN -->
+        <main class="flex-1 p-8">
+        <div class="bg-white rounded-xl shadow overflow-x-auto">
+            <table class="w-full text-left">
+                <thead class="bg-blue-600 text-white">
+                    <tr>
+                        <th class="p-3">ID</th>
+                        <th class="p-3">Nama Peminjam</th>
+                        <th class="p-3">Kelas</th>
+                        <th class="p-3">Alat</th>
+                        <th class="p-3">Jumlah</th>
+                        <th class="p-3">Tanggal Pinjam</th>
+                        <th class="p-3">Tanggal Kembali</th>
+                        <th class="p-3">Status</th>
+                        <th class="p-3">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="tabelPeminjaman">
+                    <tr>
+                        <td colspan="9" class="p-5 text-center">
+                            Memuat data...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </main>
+
+<script>
+const API_PEMINJAMAN = "http://localhost:3000/api/peminjaman";
+
+async function loadPeminjaman() {
+    const tabel = document.getElementById("tabelPeminjaman");
+
+    try {
+        const response = await fetch(API_PEMINJAMAN);
+        if (!response.ok) throw new Error("Gagal mengambil data peminjaman");
+
+        const hasil = await response.json();
+        const daftar = Array.isArray(hasil) ? hasil : hasil.data || [];
+
+        if (daftar.length === 0) {
+            tabel.innerHTML = `
+                <tr>
+                    <td colspan="9" class="p-5 text-center">
+                        Belum ada data peminjaman.
+                    </td>
+                </tr>`;
+            return;
+        }
+
+        tabel.innerHTML = daftar.map(item => `
+            <tr class="border-b hover:bg-gray-50">
+                <td class="p-3">${item.id_peminjaman ?? "-"}</td>
+                <td class="p-3">${item.nama_peminjam ?? "-"}</td>
+                <td class="p-3">${item.kelas ?? "-"}</td>
+                <td class="p-3">${item.nama_alat ?? item.id_alat ?? "-"}</td>
+                <td class="p-3">${item.jumlah ?? "-"}</td>
+                <td class="p-3">${item.tanggal_pinjam ?? "-"}</td>
+                <td class="p-3">${item.tanggal_kembali ?? "-"}</td>
+                <td class="p-3">${item.status ?? "-"}</td>
+                <td class="p-3">
+                    <div class="flex gap-2">
+                        <button
+                            onclick="editPeminjaman(${item.id_peminjaman})"
+                            class="bg-yellow-500 hover:bg-yellow-600 text-white px-3 py-1 rounded-lg">
+                            Ediy
+                        </button>
+
+                        <button
+                            onclick="hapusPeminjaman(${item.id_peminjaman})"
+                            class="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded-lg">
+                            Hapus
+                        </button>
+                    </div>
+                </td>
+            </tr>
+        `).join("");
+
+    } catch (error) {
+        console.error(error);
+        tabel.innerHTML = `
+            <tr>
+                <td colspan="9" class="p-5 text-center text-red-600">
+                    Data gagal dimuat. Periksa server backend.
+                </td>
+            </tr>`;
+    }
+}
+
+// Tombol Edit
+function editPeminjaman(id) {
+    window.location.href = "TambahPeminjaman.html?id=" + id;
+}
+
+// Tombol Hapus
+async function hapusPeminjaman(id) {
+    const konfirmasi = confirm(
+        "Apakah kamu yakin ingin menghapus data peminjaman ini?"
+    );
+
+    if (!konfirmasi) return;
+
+    try {
+        const response = await fetch(`${API_PEMINJAMAN}/${id}`, {
+            method: "DELETE"
+        });
+
+        const hasil = await response.json();
+
+        if (!response.ok) {
+            alert("Gagal menghapus: " + (hasil.message || response.status));
+            return;
+        }
+
+        alert("Data peminjaman berhasil dihapus!");
+        loadPeminjaman();
+
+    } catch (error) {
+        console.error(error);
+        alert("Server tidak dapat dihubungi.");
+    }
+}
+
+loadPeminjaman();
+</script>
+</body>
+</html>

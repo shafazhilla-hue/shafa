@@ -1,0 +1,160 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tambah Peminjaman</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 text-gray-700">
+<div class="flex min-h-screen">
+
+    <aside class="w-56 bg-white shadow-md min-h-screen">
+        <h2 class="text-xl font-bold text-blue-600 p-5">
+            PEMINJAMAN ALAT
+        </h2>
+
+        <nav class="font-medium">
+            <a href="dashboard.html" class="block px-6 py-3 hover:bg-blue-50">DASHBOARD</a>
+            <a href="DataKategori.html" class="block px-6 py-3 hover:bg-blue-50">DATA KATEGORI</a>
+            <a href="DataAlat.html" class="block px-6 py-3 hover:bg-blue-50">DATA ALAT</a>
+            <a href="TambahAlat.html" class="block px-6 py-3 hover:bg-blue-50">TAMBAH ALAT</a>
+            <a href="Peminjaman.html" class="block px-6 py-3 hover:bg-blue-50">PEMINJAMAN</a>
+            <a href="TambahPeminjaman.html" class="block px-6 py-3 bg-blue-100 text-blue-600 font-bold">TAMBAH PEMINJAMAN</a>
+        </nav>
+    </aside>
+
+    <main class="flex-1 max-w-2xl mx-auto p-8">
+        <h1 class="text-3xl font-bold mb-2">Tambah Peminjaman</h1>
+        <p class="text-gray-500 mb-6">Catat transaksi peminjaman alat.</p>
+
+        <div class="bg-white rounded-xl shadow p-6">
+            <form id="formPeminjaman">
+                <label class="block font-semibold mb-2">Nama Peminjam</label>
+                <input id="nama_peminjam" type="text"
+                    class="w-full border rounded-lg p-2 mb-4" required>
+
+                <label class="block font-semibold mb-2">Kelas</label>
+                <input id="kelas" type="text"
+                    class="w-full border rounded-lg p-2 mb-4" required>
+
+                <label class="block font-semibold mb-2">Alat</label>
+                <select id="id_alat"
+                    class="w-full border rounded-lg p-2 mb-4" required>
+                    <option value="">-- Pilih Alat --</option>
+                </select>
+
+                <label class="block font-semibold mb-2">Jumlah</label>
+                <input id="jumlah" type="number" min="1"
+                    class="w-full border rounded-lg p-2 mb-4" required>
+
+                <label class="block font-semibold mb-2">Tanggal Pinjam</label>
+                <input id="tanggal_pinjam" type="date"
+                    class="w-full border rounded-lg p-2 mb-4" required>
+
+                <label class="block font-semibold mb-2">Tanggal Kembali</label>
+                <input id="tanggal_kembali" type="date"
+                    class="w-full border rounded-lg p-2 mb-4" required>
+
+                <label class="block font-semibold mb-2">Status</label>
+                <select id="status"
+                    class="w-full border rounded-lg p-2 mb-6" required>
+                    <option value="Dipinjam">Dipinjam</option>
+                    <option value="Dikembalikan">Dikembalikan</option>
+                    <option value="Terlambat">Terlambat</option>
+                </select>
+
+                <button type="submit"
+                    class="bg-blue-600 text-white px-5 py-2 rounded-lg">
+                    Simpan
+                </button>
+
+                <a href="Peminjaman.html"
+                    class="bg-gray-500 text-white px-5 py-2 rounded-lg">
+                    Kembali
+                </a>
+            </form>
+        </div>
+    </main>
+
+<script>
+const API_ALAT = "http://localhost:3000/api/alat";
+const API_PEMINJAMAN = "http://localhost:3000/api/peminjaman";
+
+// Mengambil daftar alat dari database
+async function loadAlat() {
+    const select = document.getElementById("id_alat");
+
+    try {
+        const response = await fetch(API_ALAT);
+        if (!response.ok) throw new Error("Gagal mengambil alat");
+
+        const hasil = await response.json();
+        const daftar = Array.isArray(hasil) ? hasil : hasil.data || [];
+
+        select.innerHTML = '<option value="">-- Pilih Alat --</option>';
+
+        daftar.forEach(alat => {
+            const option = document.createElement("option");
+            option.value = alat.id_alat;
+            option.textContent = alat.nama_alat + " (Stok: " + alat.stok + ")";
+            select.appendChild(option);
+        });
+    } catch (error) {
+        console.error(error);
+        alert("Data alat gagal dimuat. Periksa server.");
+    }
+}
+
+// Menyimpan peminjaman ke database
+document.getElementById("formPeminjaman")
+.addEventListener("submit", async function(e) {
+    e.preventDefault();
+
+    const payload = {
+        id_alat: Number(document.getElementById("id_alat").value),
+        nama_peminjam: document.getElementById("nama_peminjam").value.trim(),
+        kelas: document.getElementById("kelas").value.trim(),
+        tanggal_pinjam: document.getElementById("tanggal_pinjam").value,
+        tanggal_kembali: document.getElementById("tanggal_kembali").value,
+        jumlah: Number(document.getElementById("jumlah").value),
+        status: document.getElementById("status").value
+    };
+
+    try {
+        const response = await fetch(API_PEMINJAMAN, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(payload)
+        });
+
+        const hasil = await response.json();
+
+       if (!response.ok) {
+    const alasan = hasil.error || hasil.message || response.status;
+
+    alert(
+        "GAGAL MENYIMPAN PEMINJAMAN!\n\n" +
+        "Alasan: " + alasan
+    );
+
+    console.error("Detail kesalahan:", hasil);
+    return;
+}
+
+        alert("Peminjaman berhasil ditambahkan!");
+        window.location.href = "Peminjaman.html";
+
+    } catch (error) {
+        console.error(error);
+        alert("Server tidak dapat dihubungi.");
+    }
+});
+
+loadAlat();
+</script>
+</body>
+</html>
